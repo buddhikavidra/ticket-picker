@@ -41,22 +41,27 @@ def generate_random_string(string_length):
     letters = string.ascii_letters
     return ''.join(random.choice(letters) for i in range(string_length))
 
-driver.find_element('xpath', "//span[text()='Login']").click()
-time.sleep(5)
+
 def login():
-    username = "gerhardtbeats2@outlook.com"
-    password = "Newpassword1102!"
-    time.sleep(2)
-    driver.find_element('xpath', '//input[@id="username"]').click()
-    driver.find_element('xpath', '//input[@id="username"]').clear()
-    driver.find_element('xpath', '//input[@id="username"]').send_keys(username)
-    
-    time.sleep(1)
-    driver.find_element('xpath', '//input[@id="password"]').click()
-    driver.find_element('xpath', '//input[@id="password"]').clear()
-    driver.find_element('xpath', '//input[@id="password"]').send_keys(password)
-    time.sleep(1)
-    driver.find_element('xpath', '//button[@name="login"]').click()
+    driver.get("https://tickets.fcbayern.com/internetverkaufzweitmarkt/EventList.aspx")
+    time.sleep(5)
+    try:
+        driver.find_element('xpath', "//span[text()='Login']").click()
+        username = "gerhardtbeats2@outlook.com"
+        password = "Newpassword1102!"
+        time.sleep(2)
+        driver.find_element('xpath', '//input[@id="username"]').click()
+        driver.find_element('xpath', '//input[@id="username"]').clear()
+        driver.find_element('xpath', '//input[@id="username"]').send_keys(username)
+        
+        time.sleep(1)
+        driver.find_element('xpath', '//input[@id="password"]').click()
+        driver.find_element('xpath', '//input[@id="password"]').clear()
+        driver.find_element('xpath', '//input[@id="password"]').send_keys(password)
+        time.sleep(1)
+        driver.find_element('xpath', '//button[@name="login"]').click()
+    except:
+        print("already logged in or error i the logi")
     time.sleep(5)
     try:
         driver.find_element('xpath', "//span[text()='"+evetame+"']/ancestor::div[@class='side-box-container']/descendant::a[text()='buy online']").click()
@@ -64,13 +69,10 @@ def login():
         driver.find_element('xpath', "//span[text()='Ticket selection']").click()
     except:
         print("event click failed")
-        driver.save_screenshot(generate_random_string(5)+".png")
-#//span[@class="select2-results"]/ul/li[contains(text(),'Kategorie 4')]
-#//span[text()='FC Bayern München -  Eintracht Frankfurt']/ancestor::div[@class='side-box-container']/descendant::a[text()='buy online']
-#driver.save_screenshot("full_page_screenshot.png")
-#//a[contains(text(),'Add to')]
+        driver.save_screenshot("eventclickfailed"+generate_random_string(5)+".png")
+
 login()
-#driver.get("https://tickets.fcbayern.com/internetverkaufzweitmarkt/SelectTicketMarketTickets.aspx")
+
 time.sleep(5)
 a = 1
 while True:
@@ -81,9 +83,12 @@ while True:
         login()
     try:
         driver.find_element('xpath', "//a[contains(text(),'Add to')]")
-        driver.save_screenshot(generate_random_string(5)+".png")
+        driver.find_element('xpath', "(//a[contains(text(),'Add to')])[1]").click()
+        driver.save_screenshot("sucess"+generate_random_string(5)+".png")
     except:
         print("ot fou tickets refreshig")
         driver.refresh()
-        time.sleep(5)
+        tme = random.randint(1, 50)
+        print("wait time : "+str(tme))
+        time.sleep(tme)
     a=a+1
