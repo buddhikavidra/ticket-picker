@@ -17,11 +17,12 @@ config.read('config.ini')
 userame = config.get('DEFAULT','userame')
 eventurl = config.get('DEFAULT','event')
 current_directory = os.getcwd()
-#time duratio amaog 
+#time duration amaog 
 customiterval = 1
 
-evetame = 'FC Bayern München - 1. FC Union Berlin'
-
+evetame = config.get('DEFAULT','evetame')
+PageNumber = config.get('DEFAULT','pageNo')
+EventNoInPageFromTop=config.get('DEFAULT','EventNoInPageFromTop')
 
 
 options = uc.ChromeOptions()
@@ -42,6 +43,25 @@ def generate_random_string(string_length):
     return ''.join(random.choice(letters) for i in range(string_length))
 
 
+def PageSelection_EventSelectioPage():
+
+    #GettextPage = driver.find_element('xpath' , "(//td/span[contains(@id,'PageInfo')])[1]").text
+    #a=GettextPage.split
+    a1= int(PageNumber)
+
+    if a1==1:
+        print("Page Number : " + PageNumber)
+    else :
+        for iter in range(1 , a1):
+            converted_num = str(iter+1)   
+            print("Page Number : " + converted_num)
+            driver.find_element('xpath', "(//input[contains(@id,'btnNextPage')])[1]").click() 
+            time.sleep(2)
+
+
+def error_Message():
+    driver.find_element('xpath', "//a[text()='Back']").click()
+
 def login():
     driver.get("https://tickets.fcbayern.com/internetverkaufzweitmarkt/EventList.aspx")
     time.sleep(5)
@@ -61,18 +81,44 @@ def login():
         time.sleep(1)
         driver.find_element('xpath', '//button[@name="login"]').click()
     except:
-        print("already logged in or error i the logi")
+        print("already logged in or error in the login")
     time.sleep(5)
+    PageSelection_EventSelectioPage()
     try:
-        driver.find_element('xpath', "//span[text()='"+evetame+"']/ancestor::div[@class='side-box-container']/descendant::a[text()='buy online']").click()
+        driver.find_element('xpath', "(//img[contains(@id,'EventImage')])["+EventNoInPageFromTop+"]/ancestor::div[@class='side-box-container']/descendant::a[text()='buy online']").click()
         time.sleep(7)
-        driver.find_element('xpath', "//span[text()='Ticket selection']").click()
+        #driver.find_element('xpath', "//span[text()='Ticket selection']").click()
+        driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
+        driver.save_screenshot("Tickets Available"+generate_random_string(5)+".png")
     except:
         print("event click failed")
         driver.save_screenshot("eventclickfailed"+generate_random_string(5)+".png")
+        
 
 login()
 
+"""
+try:
+        driver.find_element('xpath', '//span[@class="icon icon-user button-icon is-white type-icon"]')
+except:
+        login()
+GetCount = driver.find_elements('xpath', "//a[contains(text(),'Add to')]")   
+count = len(GetCount)
+print("Available Ticket Count : " +count)
+c1 =  int(count) 
+for iter in range(1 , c1+1):
+   try: 
+        if c1==1:
+            driver.find_element('xpath', "(//a[contains(text(),'Add to')])[1]").click()
+        else:
+            driver.find_element('xpath', "(//a[contains(text(),'Add to')])[1]").click()
+   except:       
+        driver.refresh()
+        tme = random.randint(1, 50)
+        print("wait time : "+str(tme))
+        time.sleep(tme)   
+
+"""          
 time.sleep(5)
 a = 1
 while True:
@@ -82,13 +128,27 @@ while True:
     except:
         login()
     try:
-        driver.find_element('xpath', "//a[contains(text(),'Add to')]")
+        GetCount = driver.find_elements('xpath', "//a[contains(text(),'Add to')]")   
+        count = len(GetCount)
+        print("Available Ticket Count : " +count)
+        c1 =  int(count) 
         driver.find_element('xpath', "(//a[contains(text(),'Add to')])[1]").click()
-        driver.save_screenshot("sucess"+generate_random_string(5)+".png")
+        #driver.save_screenshot("sucess"+generate_random_string(5)+".png")
+        time.sleep(1)
+        VisibilityElementErrorMsg = driver.find_element('xpath' , "//h1[@itemprop='headline']/span[contains(@id,'ErrorMessages1')]")
+
+        if VisibilityElementErrorMsg.is_displayed:
+            print("Error Message is displayed") 
+            error_Message()
+        else :
+           print("Error Message is Not displayed")
+
     except:
-        print("ot fou tickets refreshig")
+        print("No tickets found || Start refreshing")
         driver.refresh()
         tme = random.randint(1, 50)
         print("wait time : "+str(tme))
         time.sleep(tme)
     a=a+1
+
+
