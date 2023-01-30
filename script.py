@@ -21,8 +21,7 @@ current_directory = os.getcwd()
 customiterval = 1
 
 evetame = config.get('DEFAULT','evetame')
-PageNumber = config.get('DEFAULT','pageNo')
-EventNoInPageFromTop=config.get('DEFAULT','EventNoInPageFromTop')
+
 
 
 options = uc.ChromeOptions()
@@ -47,6 +46,19 @@ def PageSelection_EventSelectioPage():
 
     #GettextPage = driver.find_element('xpath' , "(//td/span[contains(@id,'PageInfo')])[1]").text
     #a=GettextPage.split
+    a = 1
+    while True:
+        print("itr : "+ str(a))
+        try:
+            driver.find_element('xpath', "(//img[contains(@id,'EventImage')])[2]/ancestor::div[@class='side-box-container']/descendant::a[text()='buy online']").click()            
+            #driver.find_element('xpath', "//span[text()='"+evetame+"']/ancestor::div[@class='side-box-container']/descendant::a[text()='buy online']").click()
+            break
+        except:
+            driver.find_element('xpath', "(//input[contains(@id,'btnNextPage')])[1]").click()
+            time.sleep(2)
+            a=+1
+                
+    """
     a1= int(PageNumber)
 
     if a1==1:
@@ -57,6 +69,7 @@ def PageSelection_EventSelectioPage():
             print("Page Number : " + converted_num)
             driver.find_element('xpath', "(//input[contains(@id,'btnNextPage')])[1]").click() 
             time.sleep(2)
+    """        
 
 
 def error_Message():
@@ -85,7 +98,7 @@ def login():
     time.sleep(5)
     PageSelection_EventSelectioPage()
     try:
-        driver.find_element('xpath', "(//img[contains(@id,'EventImage')])["+EventNoInPageFromTop+"]/ancestor::div[@class='side-box-container']/descendant::a[text()='buy online']").click()
+        
         time.sleep(7)
         #driver.find_element('xpath', "//span[text()='Ticket selection']").click()
         driver.execute_script("window.scrollTo(0,document.body.scrollHeight)")
@@ -127,21 +140,30 @@ while True:
         driver.find_element('xpath', '//span[@class="icon icon-user button-icon is-white type-icon"]')
     except:
         login()
+
+
+    try:
+        VisibilityElementErrorMsg = driver.find_element('xpath' , "//h1[@itemprop='headline']/span[contains(@id,'ErrorMessages1')]")           
+        visibility = len(VisibilityElementErrorMsg)   
+        if (visibility>0): 
+            print("Error Message is displayed")
+            error_Message()
+    except:
+        print("Error Message is Not displayed")
+
+               
     try:
         GetCount = driver.find_elements('xpath', "//a[contains(text(),'Add to')]")   
         count = len(GetCount)
-        print("Available Ticket Count : " +count)
-        c1 =  int(count) 
+        count1 = str(count)
+        print("Available Ticket Count : " +count1)
         driver.find_element('xpath', "(//a[contains(text(),'Add to')])[1]").click()
         #driver.save_screenshot("sucess"+generate_random_string(5)+".png")
         time.sleep(1)
-        VisibilityElementErrorMsg = driver.find_element('xpath' , "//h1[@itemprop='headline']/span[contains(@id,'ErrorMessages1')]")
-
-        if VisibilityElementErrorMsg.is_displayed:
-            print("Error Message is displayed") 
-            error_Message()
-        else :
-           print("Error Message is Not displayed")
+            
+              
+                
+          
 
     except:
         print("No tickets found || Start refreshing")
